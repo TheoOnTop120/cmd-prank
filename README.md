@@ -31,7 +31,7 @@ No installation, no dependencies: just open `index.html` in a browser.
 # clone then open
 git clone https://github.com/<your-username>/cmd-prank.git
 cd cmd-prank
-# then double-click index.html, or:
+# then **double-click** index.html, or:
 python3 -m http.server 8000
 # and open http://localhost:8000
 ```
@@ -69,24 +69,3 @@ cmd-prank/
 └── js/
     └── app.js    # Terminal logic (commands, scan, sounds)
 ```
-
-## Putting the project on GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/<your-username>/cmd-prank.git
-git push -u origin main
-```
-
-### Publishing the site with GitHub Pages
-
-1. On GitHub, open **Settings** → **Pages**.
-2. Under **Build and deployment**, choose the `main` branch and the `/ (root)` folder.
-3. The site will be available at `https://<your-username>.github.io/cmd-prank/`.
-
-## License
-
-No license has been chosen yet. If you want to let others reuse the code, add a `LICENSE` file (MIT, Apache-2.0, ...) via the GitHub interface (**Add file** → **Choose a license template**).

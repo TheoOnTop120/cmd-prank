@@ -1,0 +1,92 @@
+# cmd-prank — Windows Terminal Simulator (Prank)
+
+A replica of the Windows command prompt (`cmd.exe`) that runs in the browser, with a "hacker" vibe. The user types `dir /s`, a fake scan of all folders starts with a fast-scrolling list of fictional files and beeping sounds, and the final screen displays a humorous fake ransom message.
+
+> **Disclaimer**: this project is a pure simulation made for fun. No real files are read, modified or sent, no data is collected, and the final message is a joke — it is not a real payment demand.
+
+## Preview
+
+
+```
+Microsoft Windows [Version 10.0.19045.0000]
+(c) Microsoft Corporation. All rights reserved.
+
+
+C:\Users\User> dir /s
+
+
+ Directory of C:\Windows\System32
+
+
+02/07/2026  14:22    <DIR>          System
+02/07/2026  14:22        4 821 337 kernel32.dll
+...
+```
+
+## Usage
+
+No installation, no dependencies: just open `index.html` in a browser.
+
+```bash
+# clone then open
+git clone https://github.com/<your-username>/cmd-prank.git
+cd cmd-prank
+# then double-click index.html, or:
+python3 -m http.server 8000
+# and open http://localhost:8000
+```
+
+### Available commands
+
+| Command | Effect |
+| --- | --- |
+| `dir` | Lists the (fictional) files in the current folder |
+| `dir /s` | Starts the fake scan of all folders |
+| `cls` / `clear` | Clears the console |
+| `help` | Shows the list of commands |
+| `cd <folder>` | Changes directory (fictional) |
+| `cd ..` | Goes up to the parent folder |
+| `echo <text>` | Displays the text |
+| `whoami` | Shows the current user |
+| `ver` | Shows the Windows version |
+| `date` / `time` | Shows the date / time |
+| `ipconfig` | Displays a fictional network configuration |
+| `systeminfo` | Displays fictional system information |
+| `color <code>` | Changes the text color (`0a`, `0c`, `0e`, `green`, `red`, ...) |
+| `exit` | Closes the session |
+
+### Stopping the scan
+
+During the scan triggered by `dir /s`, press the **`G` key 5 times** to interrupt it and display the final screen. The **Restart** button resets the terminal from scratch.
+
+## Project structure
+
+```text
+cmd-prank/
+├── index.html    # Page structure
+├── css/
+│   └── style.css # Styles (neon green terminal, final screen)
+└── js/
+    └── app.js    # Terminal logic (commands, scan, sounds)
+```
+
+## Putting the project on GitHub
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/<your-username>/cmd-prank.git
+git push -u origin main
+```
+
+### Publishing the site with GitHub Pages
+
+1. On GitHub, open **Settings** → **Pages**.
+2. Under **Build and deployment**, choose the `main` branch and the `/ (root)` folder.
+3. The site will be available at `https://<your-username>.github.io/cmd-prank/`.
+
+## License
+
+No license has been chosen yet. If you want to let others reuse the code, add a `LICENSE` file (MIT, Apache-2.0, ...) via the GitHub interface (**Add file** → **Choose a license template**).

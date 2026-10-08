@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cmd.exe</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/app.js" defer></script>
+  </head>
+
+  <body>
+    <main id="terminal">
+      <div id="history">
+Microsoft Windows [Version 10.0.19045.0000]
+(c) Microsoft Corporation. All rights reserved.
+
+
+Type <span style="color:#a8ffb5">help</span>, then press Enter.
+
+
+      </div>
+
+      <form id="command-form" class="prompt-line" autocomplete="off">
+        <span id="prompt" class="prompt">C:\Users\User> </span>
+        <input
+          id="command-input"
+          type="text"
+          aria-label="Terminal command"
+          autofocus
+          spellcheck="false"
+          autocomplete="off"
+        >
+      </form>
+
+      <div id="output"></div>
+    </main>
+
+    <div id="counter">G : 0 / 5</div>
+
+    <section id="finished">
+      <div class="box">
+        <h1>All your files are now on the dark web.</h1>
+        <p>
+          If you want them removed from the dark web, make a transfer of 50000 euros to account BE53 7658 7652 2154 or via PayPal:
+        </p>
+        <button id="restart" type="button">Restart</button>
+      </div>
+    </section>
+  </body>
+</html>

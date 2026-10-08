@@ -19,7 +19,8 @@ body {
 
 #terminal {
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
   font-size: clamp(11px, 1.6vw, 16px);

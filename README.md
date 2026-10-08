@@ -42,10 +42,9 @@ python3 -m http.server 8000
 | --- | --- |
 | `dir` | Lists the (fictional) files in the current folder |
 | `dir /s` | Starts the fake scan of all folders |
-| `cls` / `clear` | Clears the console |
-| `help` | Shows the list of commands |
-| `cd <folder>` | Changes directory (fictional) |
-| `cd ..` | Goes up to the parent folder |
+| `clear` / `cls` | Clears the console |
+| `help [command]` | Shows available commands or detailed help for one command |
+| `cd <folder>` / `chdir <folder>` | Changes directory (fictional); `cd ..` goes to the parent folder |
 | `echo <text>` | Displays the text |
 | `whoami` | Shows the current user |
 | `ver` | Shows the Windows version |
@@ -53,7 +52,10 @@ python3 -m http.server 8000
 | `ipconfig` | Displays a fictional network configuration |
 | `systeminfo` | Displays fictional system information |
 | `color <code>` | Changes the text color (`0a`, `0c`, `0e`, `green`, `red`, ...) |
+| `stop` | Reports that no scan is currently running |
 | `exit` | Closes the session |
+
+Commands are registered in the terminal and their aliases are resolved by the same registry. Quote arguments containing spaces, for example `cd "Program Files"`.
 
 ### Stopping the scan
 

@@ -135,31 +135,6 @@ function clearTerminal() {
   output.textContent = "";
 }
 
-function showHelp() {
-  addText(`
-Commands available in this console:
-
-
-  dir                 Lists files
-  dir /s              Scans all folders and subfolders
-  cls                 Clears the console
-  clear               Wipes the terminal
-  cd <folder>         Changes folder
-  cd ..               Goes back to the parent folder
-  echo <text>         Displays some text
-  whoami              Displays the user
-  ver                 Displays a Windows version
-  date                Displays the date
-  time                Displays the current time
-  ipconfig            Displays the network configuration
-  systeminfo          Displays system information
-  color <code>        Changes the text color
-  exit                Closes the console
-
-
-`);
-}
-
 function showDirectory() {
   const fakeFiles = [];
 
@@ -382,6 +357,224 @@ Type "help" for available commands.
   commandInput.focus();
 }
 
+const commandRegistry = new Map();
+
+function registerCommand(command) {
+  commandRegistry.set(command.name.toLowerCase(), command);
+
+  for (const alias of command.aliases) {
+    commandRegistry.set(alias.toLowerCase(), command);
+  }
+}
+
+function findCommand(name) {
+  return commandRegistry.get(name.toLowerCase());
+}
+
+function parseCommandLine(input) {
+  const tokens = [];
+  let token = "";
+  let inQuotes = false;
+  let tokenStarted = false;
+
+  for (const character of input) {
+    if (character === '"') {
+      inQuotes = !inQuotes;
+      tokenStarted = true;
+    } else if (/\s/.test(character) && !inQuotes) {
+      if (tokenStarted) {
+        tokens.push(token);
+        token = "";
+        tokenStarted = false;
+      }
+    } else {
+      token += character;
+      tokenStarted = true;
+    }
+  }
+
+  if (tokenStarted) {
+    tokens.push(token);
+  }
+
+  return {
+    command: (tokens.shift() || "").toLowerCase(),
+    args: tokens
+  };
+}
+
+function showHelp(commandName) {
+  if (commandName) {
+    const command = findCommand(commandName);
+
+    if (!command) {
+      addText(`No help available for '${commandName}'.\n`);
+      return;
+    }
+
+    addText(
+      `\nName: ${command.name}\n` +
+      `Description: ${command.description}\n` +
+      `Usage: ${command.usage}\n` +
+      `Aliases: ${command.aliases.length ? command.aliases.join(", ") : "None"}\n\n`
+    );
+    return;
+  }
+
+  const commands = [...new Set(commandRegistry.values())];
+  const nameWidth = Math.max(...commands.map(({ name }) => name.length));
+  const listing = commands
+    .map(({ name, description }) => `  ${name.padEnd(nameWidth)}  ${description}`)
+    .join("\n");
+
+  addText(`\nCommands available in this console:\n\n${listing}\n\n`);
+}
+
+registerCommand({
+  name: "dir",
+  aliases: [],
+  description: "Lists files or scans all folders and subfolders.",
+  usage: "dir [/s]",
+  execute(args) {
+    if (args.some((argument) => argument.toLowerCase() === "/s")) {
+      startTerminal();
+    } else {
+      showDirectory();
+    }
+  }
+});
+
+registerCommand({
+  name: "clear",
+  aliases: ["cls"],
+  description: "Clears the console.",
+  usage: "clear",
+  execute() {
+    clearTerminal();
+  }
+});
+
+registerCommand({
+  name: "help",
+  aliases: ["/?"],
+  description: "Displays available commands or detailed command help.",
+  usage: "help [command]",
+  execute(args) {
+    showHelp(args[0]);
+  }
+});
+
+registerCommand({
+  name: "echo",
+  aliases: [],
+  description: "Displays text.",
+  usage: "echo [text]",
+  execute(args) {
+    addText(`${args.join(" ")}\n`);
+  }
+});
+
+registerCommand({
+  name: "cd",
+  aliases: ["chdir"],
+  description: "Changes the current folder or displays it.",
+  usage: "cd [folder]",
+  execute(args) {
+    changeFolder(args.join(" "));
+  }
+});
+
+registerCommand({
+  name: "whoami",
+  aliases: [],
+  description: "Displays the current user.",
+  usage: "whoami",
+  execute() {
+    addText("desktop-user\\theo\n");
+  }
+});
+
+registerCommand({
+  name: "ver",
+  aliases: [],
+  description: "Displays the Windows version.",
+  usage: "ver",
+  execute() {
+    addText("Microsoft Windows [Version 10.0.19045.0000]\n");
+  }
+});
+
+registerCommand({
+  name: "date",
+  aliases: [],
+  description: "Displays the current date.",
+  usage: "date",
+  execute() {
+    showDate();
+  }
+});
+
+registerCommand({
+  name: "time",
+  aliases: [],
+  description: "Displays the current time.",
+  usage: "time",
+  execute() {
+    showTime();
+  }
+});
+
+registerCommand({
+  name: "ipconfig",
+  aliases: [],
+  description: "Displays the network configuration.",
+  usage: "ipconfig",
+  execute() {
+    showIpconfig();
+  }
+});
+
+registerCommand({
+  name: "systeminfo",
+  aliases: [],
+  description: "Displays system information.",
+  usage: "systeminfo",
+  execute() {
+    showSystemInfo();
+  }
+});
+
+registerCommand({
+  name: "color",
+  aliases: [],
+  description: "Changes the text color.",
+  usage: "color <code>",
+  execute(args) {
+    changeColor(args[0] || "");
+  }
+});
+
+registerCommand({
+  name: "stop",
+  aliases: [],
+  description: "Reports that no scan is currently running.",
+  usage: "stop",
+  execute() {
+    addText("No scan is currently running.\n");
+  }
+});
+
+registerCommand({
+  name: "exit",
+  aliases: [],
+  description: "Closes the session.",
+  usage: "exit",
+  execute() {
+    addText("Session closed. Refresh the page to restart.\n");
+    commandInput.disabled = true;
+  }
+});
+
 commandInput.addEventListener("keydown", (event) => {
   if (event.key.length === 1) {
     playKeySound();
@@ -392,9 +585,6 @@ commandForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const originalCommand = commandInput.value.trim();
-  const normalizedCommand = originalCommand.toLowerCase();
-  const [command, ...args] = normalizedCommand.split(/\s+/);
-  const argument = originalCommand.substring(command.length).trim();
 
   if (!originalCommand) {
     addPrompt("");
@@ -404,86 +594,17 @@ commandForm.addEventListener("submit", (event) => {
   addPrompt(originalCommand);
   commandInput.value = "";
 
-  if (command === "dir") {
-    if (normalizedCommand.includes("/s")) {
-      startTerminal();
-    } else {
-      showDirectory();
-    }
-    return;
-  }
+  const { command: commandName, args } = parseCommandLine(originalCommand);
+  const command = findCommand(commandName);
 
-  if (command === "cls" || command === "clear") {
-    clearTerminal();
-    return;
+  if (command) {
+    command.execute(args);
+  } else {
+    addText(
+      `'${originalCommand}' is not recognized as an internal or external command,\n` +
+      `operable program or batch file.\n`
+    );
   }
-
-  if (command === "help" || command === "/?") {
-    showHelp();
-    return;
-  }
-
-  if (command === "echo") {
-    addText(`${argument}\n`);
-    return;
-  }
-
-  if (command === "cd" || command === "chdir") {
-    changeFolder(argument);
-    return;
-  }
-
-  if (command === "whoami") {
-    addText("desktop-user\\theo\n");
-    return;
-  }
-
-  if (command === "ver") {
-    addText("Microsoft Windows [Version 10.0.19045.0000]\n");
-    return;
-  }
-
-  if (command === "date") {
-    showDate();
-    return;
-  }
-
-  if (command === "time") {
-    showTime();
-    return;
-  }
-
-  if (command === "ipconfig") {
-    showIpconfig();
-    return;
-  }
-
-  if (command === "systeminfo") {
-    showSystemInfo();
-    return;
-  }
-
-  if (command === "color") {
-    changeColor(args[0] || "");
-    return;
-  }
-
-  if (command === "stop") {
-    addText("No scan is currently running.\n");
-    return;
-  }
-
-  if (command === "exit") {
-    clearTerminal();
-    addText("Session closed. Refresh the page to restart.\n");
-    commandInput.disabled = true;
-    return;
-  }
-
-  addText(
-    `'${originalCommand}' is not recognized as an internal or external command,\n` +
-    `operable program or batch file.\n`
-  );
 });
 
 document.addEventListener("keydown", (event) => {

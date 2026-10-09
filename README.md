@@ -1,72 +1,109 @@
-# cmd-prank — Windows Terminal Simulator (Prank)
+# cmd-prank
 
-A replica of the Windows command prompt (`cmd.exe`) that runs in the browser, with a "hacker" vibe. The user types `dir /s`, a fake scan of all folders starts with a fast-scrolling list of fictional files and beeping sounds, and the final screen displays a humorous fake ransom message.
+<p align="center">
+  <img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3" alt="CSS3" />
+</p>
 
-> **Disclaimer**: this project is a pure simulation made for fun. No real files are read, modified or sent, no data is collected, and the final message is a joke — it is not a real payment demand.
+A fake Windows terminal built in the browser, inspired by the aesthetic of a classic `cmd.exe` session, but turned into a humorous prank experience. It simulates a command-line environment, fake system commands, a virtual filesystem, and a dramatic scanning sequence that ends with a final joke.
 
-## Preview
+> ⚠️ This project is a purely fictional and entertainment-focused simulation. It does not read or modify real files, does not collect user data, and the ending message is designed as a joke rather than a legitimate payment request.
 
+## ✨ What it does
 
-```
+- simulates a Windows terminal in plain HTML and JavaScript
+- supports a large set of command-like system, network, and file operations
+- creates a fake virtual filesystem in memory
+- displays a `dir /s` scan with visual effects and sound
+- ends with a humorous prank screen and a restart button
+
+## 🎬 Preview
+
+```text
 Microsoft Windows [Version 10.0.19045.0000]
 (c) Microsoft Corporation. All rights reserved.
 
-
 C:\Users\User> dir /s
 
-
  Directory of C:\Windows\System32
-
 
 02/07/2026  14:22    <DIR>          System
 02/07/2026  14:22        4 821 337 kernel32.dll
 ...
 ```
 
-## Usage
+## 🚀 Quick start
 
-No installation, no dependencies: just open `index.html` in a browser.
+No installation or dependencies are required. Just open the app in a browser.
+
+### Option 1 — open directly
 
 ```bash
-# clone then open
-git clone https://github.com/<your-username>/cmd-prank.git
+git clone https://github.com/TheoOnTop120/cmd-prank.git
 cd cmd-prank
-# then **double-click** index.html, or:
-python3 -m http.server 8000
-# and open http://localhost:8000
+# then open index.html in your browser
 ```
 
-### Available commands
+### Option 2 — local server
 
-Commands are registered in one command registry. Use `help <command>` for each command's description, syntax, and aliases. The simulator includes:
+```bash
+git clone https://github.com/TheoOnTop120/cmd-prank.git
+cd cmd-prank
+python3 -m http.server 8000
+```
 
-- **System:** `hostname`, `ver`, `systeminfo`, `whoami`, `date`, `time`, `driverquery`, `tasklist`, `taskkill`, `wmic`
-- **Network:** `ping`, `tracert`, `nslookup`, `netstat`, `arp`, `route`, `getmac`, `pathping`, `nbtstat`, `ipconfig`
-- **Virtual files and folders:** `dir`, `tree`, `cd` / `chdir`, `mkdir` / `md`, `rmdir` / `rd`, `copy`, `xcopy`, `move`, `del` / `erase`, `type`, `more`, `ren` / `rename`, `attrib`, `where`, `find`, `findstr`, `fc`
-- **Configuration and utilities:** `set`, `path`, `assoc`, `ftype`, `title`, `color`, `cls` / `clear`, `pause`, `start`, `help`, `exit`, `echo`
-- **Services and administration:** `sc`, `schtasks`, `shutdown`, `powercfg`, `sfc`, `chkdsk`, `dism`, `gpupdate`
+Then visit:
 
-All file operations use a shared in-memory Windows-like file system. Absolute and relative paths, quoted paths with spaces, and `>` / `>>` output redirection are supported; for example, `echo Hello > "My Documents\note.txt"`. System, process, service, disk, and network commands use consistent fictional data. They do not access the network or change the real computer. `dir /s` retains the original fake scan and keyboard interaction.
+```text
+http://localhost:8000
+```
 
-### Tests
+## 🧩 Supported commands
 
-Run the dependency-free command and file-system tests with Node.js:
+| Category | Commands |
+| --- | --- |
+| System | `hostname`, `ver`, `systeminfo`, `whoami`, `date`, `time`, `driverquery`, `tasklist`, `taskkill`, `wmic` |
+| Network | `ping`, `tracert`, `nslookup`, `netstat`, `arp`, `route`, `getmac`, `pathping`, `nbtstat`, `ipconfig` |
+| Files and folders | `dir`, `tree`, `cd` / `chdir`, `mkdir` / `md`, `rmdir` / `rd`, `copy`, `xcopy`, `move`, `del` / `erase`, `type`, `more`, `ren` / `rename`, `attrib`, `where`, `find`, `findstr`, `fc` |
+| Configuration and utilities | `set`, `path`, `assoc`, `ftype`, `title`, `color`, `cls` / `clear`, `pause`, `start`, `help`, `exit`, `echo` |
+| Services and administration | `sc`, `schtasks`, `shutdown`, `powercfg`, `sfc`, `chkdsk`, `dism`, `gpupdate` |
+
+File operations use an in-memory fake filesystem, with support for absolute and relative paths, quoted paths with spaces, and output redirection via `>` and `>>`.
+
+Example:
+
+```bat
+echo Hello > "My Documents\note.txt"
+```
+
+## 🧪 Testing
+
+The project includes Node.js tests with no external dependencies:
 
 ```bash
 node --test tests/app.test.js
 ```
 
-### Stopping the scan
+## ⏱️ How to trigger the prank scan
 
-During the scan triggered by `dir /s`, press the **`G` key 5 times** to interrupt it and display the final screen. The **Restart** button resets the terminal from scratch.
+During the fake scan started by `dir /s`, press the `G` key 5 times to interrupt the animation and reveal the final prank screen. The `Restart` button resets the terminal.
 
-## Project structure
+## 📁 Project structure
 
 ```text
 cmd-prank/
-├── index.html    # Page structure
+├── index.html          # main page and terminal shell structure
 ├── css/
-│   └── style.css # Styles (neon green terminal, final screen)
-└── js/
-    └── app.js    # Terminal logic (commands, scan, sounds)
+│   └── style.css      # terminal styling and prank screen visuals
+├── js/
+│   └── app.js         # command logic, fake filesystem, scan behavior, and sound effects
+├── tests/
+│   └── app.test.js    # behavior validation tests
+├── README.md          # project documentation
+└── .git/              # Git metadata (hidden folder)
 ```
+
+## 📝 Note
+
+This project is mainly a front-end experiment and terminal simulation designed for fun and visual jokes. It is not intended to reproduce a real Windows environment or be used as a serious productivity tool.

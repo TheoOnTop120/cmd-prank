@@ -38,24 +38,23 @@ python3 -m http.server 8000
 
 ### Available commands
 
-| Command | Effect |
-| --- | --- |
-| `dir` | Lists the (fictional) files in the current folder |
-| `dir /s` | Starts the fake scan of all folders |
-| `clear` / `cls` | Clears the console |
-| `help [command]` | Shows available commands or detailed help for one command |
-| `cd <folder>` / `chdir <folder>` | Changes directory (fictional); `cd ..` goes to the parent folder |
-| `echo <text>` | Displays the text |
-| `whoami` | Shows the current user |
-| `ver` | Shows the Windows version |
-| `date` / `time` | Shows the date / time |
-| `ipconfig` | Displays a fictional network configuration |
-| `systeminfo` | Displays fictional system information |
-| `color <code>` | Changes the text color (`0a`, `0c`, `0e`, `green`, `red`, ...) |
-| `stop` | Reports that no scan is currently running |
-| `exit` | Closes the session |
+Commands are registered in one command registry. Use `help <command>` for each command's description, syntax, and aliases. The simulator includes:
 
-Commands are registered in the terminal and their aliases are resolved by the same registry. Quote arguments containing spaces, for example `cd "Program Files"`.
+- **System:** `hostname`, `ver`, `systeminfo`, `whoami`, `date`, `time`, `driverquery`, `tasklist`, `taskkill`, `wmic`
+- **Network:** `ping`, `tracert`, `nslookup`, `netstat`, `arp`, `route`, `getmac`, `pathping`, `nbtstat`, `ipconfig`
+- **Virtual files and folders:** `dir`, `tree`, `cd` / `chdir`, `mkdir` / `md`, `rmdir` / `rd`, `copy`, `xcopy`, `move`, `del` / `erase`, `type`, `more`, `ren` / `rename`, `attrib`, `where`, `find`, `findstr`, `fc`
+- **Configuration and utilities:** `set`, `path`, `assoc`, `ftype`, `title`, `color`, `cls` / `clear`, `pause`, `start`, `help`, `exit`, `echo`
+- **Services and administration:** `sc`, `schtasks`, `shutdown`, `powercfg`, `sfc`, `chkdsk`, `dism`, `gpupdate`
+
+All file operations use a shared in-memory Windows-like file system. Absolute and relative paths, quoted paths with spaces, and `>` / `>>` output redirection are supported; for example, `echo Hello > "My Documents\note.txt"`. System, process, service, disk, and network commands use consistent fictional data. They do not access the network or change the real computer. `dir /s` retains the original fake scan and keyboard interaction.
+
+### Tests
+
+Run the dependency-free command and file-system tests with Node.js:
+
+```bash
+node --test tests/app.test.js
+```
 
 ### Stopping the scan
 

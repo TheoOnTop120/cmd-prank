@@ -61,17 +61,6 @@ body {
   background: #39ff5a;
 }
 
-#counter {
-  display: none;
-  position: fixed;
-  right: 18px;
-  bottom: 14px;
-  color: rgba(57, 255, 90, 0.45);
-  font-size: 12px;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
 #finished {
   display: none;
   position: fixed;

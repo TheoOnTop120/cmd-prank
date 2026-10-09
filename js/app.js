@@ -6,7 +6,6 @@ const commandForm = document.getElementById("command-form");
 const commandInput = document.getElementById("command-input");
 const output = document.getElementById("output");
 const prompt = document.getElementById("prompt");
-const counter = document.getElementById("counter");
 const finished = document.getElementById("finished");
 const restartButton = document.getElementById("restart");
 
@@ -103,16 +102,16 @@ const systemFolders = [
 ];
 
 const seededFiles = [
-  ["C:\\Windows\\System32\\kernel32.dll", "Windows system library (simulated)."],
-  ["C:\\Windows\\System32\\notepad.exe", "Simulated Windows Notepad executable."],
-  ["C:\\Windows\\System32\\cmd.exe", "Simulated Windows Command Processor."],
+  ["C:\\Windows\\System32\\kernel32.dll", "Windows system library."],
+  ["C:\\Windows\\System32\\notepad.exe", "Windows Notepad executable."],
+  ["C:\\Windows\\System32\\cmd.exe", "Windows Command Processor."],
   ["C:\\Windows\\System32\\drivers\\etc\\hosts", "127.0.0.1       localhost\n"],
-  ["C:\\Windows\\Temp\\update_cache.bin", "Temporary update cache (simulated)."],
-  ["C:\\Program Files\\Google\\Chrome\\chrome.exe", "Simulated browser executable."],
-  ["C:\\Users\\User\\Desktop\\Readme.txt", "Welcome to the simulated Windows desktop.\n"],
+  ["C:\\Windows\\Temp\\update_cache.bin", "Temporary update cache."],
+  ["C:\\Program Files\\Google\\Chrome\\chrome.exe", "Browser executable."],
+  ["C:\\Users\\User\\Desktop\\Readme.txt", "Welcome to the Windows desktop.\n"],
   ["C:\\Users\\User\\Documents\\notes.txt", "Remember to back up the project files.\n"],
   ["C:\\Users\\User\\Documents\\network.log", "09/10/2026 04:42:18 DHCP lease renewed.\n"],
-  ["C:\\Users\\User\\Downloads\\backup_2026.zip", "Simulated archive contents."]
+  ["C:\\Users\\User\\Downloads\\backup_2026.zip", "Archive contents."]
 ];
 
 const environment = new Map([
@@ -528,9 +527,6 @@ function startTerminal() {
   commandInput.disabled = true;
   commandForm.style.display = "none";
   output.textContent = "";
-  counter.style.display = "block";
-  counter.style.opacity = "1";
-  counter.textContent = "G : 0 / 5";
   playStartSound();
   clearInterval(intervalId);
   intervalId = setInterval(addFakeScanLines, 42);
@@ -539,7 +535,6 @@ function startTerminal() {
 function stopTerminal(showFinalScreen = true) {
   running = false;
   clearInterval(intervalId);
-  counter.style.display = "none";
   if (showFinalScreen) {
     playStopSound();
     finished.style.display = "grid";
@@ -567,7 +562,6 @@ function resetTerminal() {
   document.body.style.color = "#39ff5a";
   commandInput.style.color = "#39ff5a";
   commandInput.style.caretColor = "#39ff5a";
-  counter.style.display = "none";
   finished.style.display = "none";
   commandInput.focus();
 }
@@ -896,7 +890,7 @@ function runAdminCheck(commandName, mode) {
 }
 
 function registerCommands() {
-  command("dir", [], "Lists files or starts the fake recursive scan with /s.", "dir [path] [/s] [/b] [/a]", (args) => {
+  command("dir", [], "Lists files or scans directories recursively with /s.", "dir [path] [/s] [/b] [/a]", (args) => {
     if (isSwitch(args, "/s") && !args.some((arg) => !arg.startsWith("/"))) startTerminal();
     else showDirectory(args);
   });
@@ -912,14 +906,14 @@ function registerCommands() {
   command("systeminfo", [], "Displays detailed system configuration.", "systeminfo", () => showSystemInfo());
   command("whoami", [], "Displays the current user.", "whoami", () => addText(`${system.userName}\n`));
   command("date", [], "Displays the current date.", "date [/t]", (args) => {
-    addText(`The current date is: ${new Date().toLocaleDateString("en-GB")}${isSwitch(args, "/t") ? "" : "\nEnter the new date: (simulated; system date unchanged)\n"}`);
+    addText(`The current date is: ${new Date().toLocaleDateString("en-GB")}${isSwitch(args, "/t") ? "" : "\nEnter the new date: "}`);
   });
   command("time", [], "Displays the current time.", "time [/t]", (args) => {
-    addText(`The current time is: ${new Date().toLocaleTimeString("en-GB")}${isSwitch(args, "/t") ? "" : "\nEnter the new time: (simulated; system time unchanged)\n"}`);
+    addText(`The current time is: ${new Date().toLocaleTimeString("en-GB")}${isSwitch(args, "/t") ? "" : "\nEnter the new time: "}`);
   });
-  command("driverquery", [], "Lists installed drivers (simulated).", "driverquery [/v] [/si]", () => showDriverQuery());
-  command("tasklist", [], "Lists running processes (simulated).", "tasklist [/fi filter] [/fo table|csv]", (args) => showTasklist(args));
-  command("taskkill", [], "Ends a simulated process without affecting the computer.", "taskkill /pid PID | /im IMAGE [/f] [/t]", (args) => {
+  command("driverquery", [], "Lists installed drivers.", "driverquery [/v] [/si]", () => showDriverQuery());
+  command("tasklist", [], "Lists running processes.", "tasklist [/fi filter] [/fo table|csv]", (args) => showTasklist(args));
+  command("taskkill", [], "Ends a process.", "taskkill /pid PID | /im IMAGE [/f] [/t]", (args) => {
     const pidIndex = args.findIndex((arg) => arg.toLowerCase() === "/pid");
     const imageIndex = args.findIndex((arg) => arg.toLowerCase() === "/im");
     const byPid = pidIndex >= 0;
@@ -943,7 +937,7 @@ function registerCommands() {
     processes = processes.filter((process) => !targets.includes(process));
     for (const process of targets) addText(`SUCCESS: The process "${process.image}" with PID ${process.pid} has been terminated.\n`);
   });
-  command("wmic", [], "Queries simulated Windows Management Instrumentation data.", "wmic [cpu|os|computersystem|process [list brief]]", (args) => {
+  command("wmic", [], "Queries Windows Management Instrumentation data.", "wmic [cpu|os|computersystem|process [list brief]]", (args) => {
     const subject = (args.find((arg) => !arg.startsWith("/")) || "os").toLowerCase();
     if (subject === "cpu") addText(`Name=${system.processor}\nNumberOfCores=8\nNumberOfLogicalProcessors=8\n`);
     else if (subject === "computersystem") addText(`Name=${system.hostName}\nManufacturer=${system.manufacturer}\nModel=${system.model}\nTotalPhysicalMemory=${system.memoryMb * 1024 * 1024}\n`);
@@ -952,7 +946,7 @@ function registerCommands() {
     else invalidUsage("wmic");
   });
 
-  command("ping", [], "Tests connectivity using simulated replies; no network requests are made.", "ping [-n count] target", (args) => {
+  command("ping", [], "Tests connectivity to another host.", "ping [-n count] target", (args) => {
     let count = 4;
     const countIndex = args.findIndex((arg) => arg.toLowerCase() === "-n");
     if (countIndex >= 0) {
@@ -965,7 +959,7 @@ function registerCommands() {
     }
     simulatePing(args.find((arg) => !arg.startsWith("-")), count);
   });
-  command("tracert", [], "Shows a simulated route to a destination.", "tracert [-d] [-h maximum_hops] target", (args) => {
+  command("tracert", [], "Shows the route to a destination.", "tracert [-d] [-h maximum_hops] target", (args) => {
     const target = args.find((arg) => !arg.startsWith("-"));
     if (!target) return invalidUsage("tracert");
     const known = target === "8.8.8.8" || target.toLowerCase() === "google.com" || target === system.gateway;
@@ -976,7 +970,7 @@ function registerCommands() {
       `  2    12 ms    11 ms    13 ms  10.10.0.1\n` +
       `  3    18 ms    16 ms    17 ms  ${destination}\n\nTrace complete.\n`);
   });
-  command("nslookup", [], "Looks up a host using the simulated DNS resolver.", "nslookup [name]", (args) => {
+  command("nslookup", [], "Looks up a host name.", "nslookup [name]", (args) => {
     const target = args[0];
     if (!target) {
       addText(`Default Server:  router.home\nAddress:  ${system.gateway}\n\n`);
@@ -991,17 +985,17 @@ function registerCommands() {
     const address = target.toLowerCase() === "google.com" ? "142.250.72.14" : system.ipv4;
     addText(`Server:  router.home\nAddress:  ${system.gateway}\n\nName:    ${target}\nAddress: ${address}\n`);
   });
-  command("netstat", [], "Displays simulated network connections and listening ports.", "netstat [-a] [-n] [-o] [-p protocol] [-r]", (args) => showNetstat(args));
-  command("arp", [], "Displays the simulated ARP cache.", "arp -a | -d address", (args) => {
+  command("netstat", [], "Displays network connections and listening ports.", "netstat [-a] [-n] [-o] [-p protocol] [-r]", (args) => showNetstat(args));
+  command("arp", [], "Displays the ARP cache.", "arp -a | -d address", (args) => {
     if (isSwitch(args, "-d")) {
       const target = args[args.findIndex((arg) => arg.toLowerCase() === "-d") + 1];
       if (!target) return invalidUsage("arp");
       const priorLength = arpTable.length;
       arpTable = arpTable.filter((item) => item.ip !== target);
-      addText(priorLength === arpTable.length ? "The entry was not found.\n" : `ARP entry ${target} deleted (simulated).\n`);
+      addText(priorLength === arpTable.length ? "The entry was not found.\n" : `ARP entry ${target} deleted.\n`);
     } else showArpTable();
   });
-  command("route", [], "Displays or changes the simulated IP routing table.", "route print | route add network mask mask gateway | route delete network", (args) => {
+  command("route", [], "Displays or changes the IP routing table.", "route print | route add network mask mask gateway | route delete network", (args) => {
     const action = args[0]?.toLowerCase();
     if (!action || action === "print") return showRouteTable();
     if (action === "delete" && args[1]) {
@@ -1015,26 +1009,26 @@ function registerCommands() {
       const gateway = values[ gatewayIndex + 2 ];
       if (values.length < 4 || !gateway) return invalidUsage("route");
       routes.push({ network: values[0], mask: values[gatewayIndex + 1], gateway, interface: system.ipv4, metric: 25 });
-      addText("OK! Route added to simulated routing table.\n");
+      addText("OK! Route added.\n");
       return;
     }
     invalidUsage("route");
   });
-  command("getmac", [], "Displays the simulated network adapter MAC address.", "getmac [/v] [/fo list|table]", () => addText(
+  command("getmac", [], "Displays the network adapter MAC address.", "getmac [/v] [/fo list|table]", () => addText(
     `Physical Address    Transport Name\n=================== ==========================================================\n${system.mac}      \\Device\\Tcpip_{A42B19C7-2D31-4C5E-9F10-123456789ABC}\n`
   ));
-  command("pathping", [], "Combines simulated route tracing and packet statistics.", "pathping [-n] target", (args) => {
+  command("pathping", [], "Combines route tracing and packet statistics.", "pathping [-n] target", (args) => {
     const target = args.find((arg) => !arg.startsWith("-"));
     if (!target) return invalidUsage("pathping");
     if (!(target === "8.8.8.8" || target.toLowerCase() === "google.com" || target === system.gateway)) return networkError("pathping", target);
     addText(`Tracing route to ${target} over a maximum of 30 hops:\n  0  ${system.hostName} [${system.ipv4}]\n  1  ${system.gateway}\n  2  ${target}\n\nComputing statistics for 50 seconds...\nSource to Here   This Node/Link\nHop  RTT    Lost/Sent = Pct  Address\n  0   1ms    0/ 10 =  0%  ${system.hostName}\n  1  2ms    0/ 10 =  0%  ${system.gateway}\n  2 18ms    0/ 10 =  0%  ${target}\n`);
   });
-  command("nbtstat", [], "Displays simulated NetBIOS over TCP/IP information.", "nbtstat [-n] [-c] [-a name]", (args) => {
+  command("nbtstat", [], "Displays NetBIOS over TCP/IP information.", "nbtstat [-n] [-c] [-a name]", (args) => {
     if (isSwitch(args, "-c")) addText(`Node IpAddress: [${system.ipv4}] Scope Id: []\n\n    NetBIOS Remote Cache Name Table\n    Name               Type         Host Address    Life\n    ${system.hostName.padEnd(18)} <20>  UNIQUE       ${system.ipv4}     600\n`);
     else addText(`Ethernet:\nNode IpAddress: [${system.ipv4}] Scope Id: []\n\n                NetBIOS Local Name Table\n       Name               Type         Status\n    ${system.hostName.padEnd(19)} <00>  UNIQUE      Registered\n    WORKGROUP          <00>  GROUP       Registered\n    ${system.hostName.padEnd(19)} <20>  UNIQUE      Registered\n`);
   });
 
-  command("tree", [], "Displays the virtual directory structure recursively.", "tree [path] [/f]", (args) => {
+  command("tree", [], "Displays the directory structure recursively.", "tree [path] [/f]", (args) => {
     const targetArg = args.find((arg) => !arg.startsWith("/")) || currentFolder;
     const target = resolvePath(targetArg);
     const entry = getEntry(target);
@@ -1046,8 +1040,8 @@ function registerCommands() {
     const treeLines = walkTree(entry.path, "", [], 0, isSwitch(args, "/f"));
     addText(`${lines.join("\n")}\n${treeLines.join("\n")}\n`);
   });
-  command("cd", ["chdir"], "Changes the current virtual directory or displays it.", "cd [path]", (args) => changeFolder(args));
-  command("mkdir", ["md"], "Creates one or more virtual directories.", "mkdir directory [...]", (args) => {
+  command("cd", ["chdir"], "Changes the current directory or displays it.", "cd [path]", (args) => changeFolder(args));
+  command("mkdir", ["md"], "Creates one or more directories.", "mkdir directory [...]", (args) => {
     const paths = args.filter((arg) => !arg.startsWith("/"));
     if (!paths.length) return invalidUsage("mkdir");
     for (const path of paths) {
@@ -1055,7 +1049,7 @@ function registerCommands() {
       else if (!createDirectory(path)) addText(`The directory could not be created: ${path}\n`);
     }
   });
-  command("rmdir", ["rd"], "Removes an empty virtual directory; /s removes its contents.", "rmdir [/s] [/q] directory", (args) => {
+  command("rmdir", ["rd"], "Removes a directory; /s removes its contents.", "rmdir [/s] [/q] directory", (args) => {
     const targetArg = args.find((arg) => !arg.startsWith("/"));
     if (!targetArg) return invalidUsage("rmdir");
     const target = resolvePath(targetArg);
@@ -1072,7 +1066,7 @@ function registerCommands() {
     }
     if (!isSwitch(args, "/q")) addText(`${target} removed.\n`);
   });
-  command("copy", [], "Copies a virtual file to another virtual path.", "copy source destination", (args) => {
+  command("copy", [], "Copies a file to another path.", "copy source destination", (args) => {
     const paths = args.filter((arg) => !arg.startsWith("/"));
     if (paths.length !== 2) return invalidUsage("copy");
     const sources = expandVirtualPath(paths[0], false);
@@ -1087,7 +1081,7 @@ function registerCommands() {
     }
     addText(`${sources.length} file(s) copied.\n`);
   });
-  command("xcopy", [], "Copies files or a directory tree within the virtual file system.", "xcopy source destination [/s] [/e] [/i] [/y]", (args) => {
+  command("xcopy", [], "Copies files or a directory tree.", "xcopy source destination [/s] [/e] [/i] [/y]", (args) => {
     const paths = args.filter((arg) => !arg.startsWith("/"));
     if (paths.length !== 2) return invalidUsage("xcopy");
     const sourcePath = resolvePath(paths[0]);
@@ -1123,7 +1117,7 @@ function registerCommands() {
     }
     addText(`${sourceEntries.filter((entry) => entry.type === "file").length} File(s) copied\n`);
   });
-  command("move", [], "Moves or renames a virtual file or directory.", "move source destination", (args) => {
+  command("move", [], "Moves or renames a file or directory.", "move source destination", (args) => {
     const paths = args.filter((arg) => !arg.startsWith("/"));
     if (paths.length !== 2) return invalidUsage("move");
     const result = moveEntry(paths[0], paths[1]);
@@ -1133,7 +1127,7 @@ function registerCommands() {
     else if (result.error === "inside") addText("Cannot move a directory into itself.\n");
     else addText("        1 file(s) moved.\n");
   });
-  command("del", ["erase"], "Deletes virtual files; it never touches files on the computer.", "del [/q] [/s] file [...]", (args) => {
+  command("del", ["erase"], "Deletes one or more files.", "del [/q] [/s] file [...]", (args) => {
     const paths = args.filter((arg) => !arg.startsWith("/"));
     if (!paths.length) return invalidUsage("del");
     let deleted = 0;
@@ -1160,7 +1154,7 @@ function registerCommands() {
     }
     if (!isSwitch(args, "/q")) addText(`${deleted} file(s) deleted.\n`);
   });
-  command("type", [], "Displays the contents of virtual text files.", "type file [...]", (args) => {
+  command("type", [], "Displays the contents of text files.", "type file [...]", (args) => {
     if (!args.length) return invalidUsage("type");
     for (const path of args) {
       const content = readFile(resolvePath(path));
@@ -1168,7 +1162,7 @@ function registerCommands() {
       else addText(content.endsWith("\n") ? content : `${content}\n`);
     }
   });
-  command("more", [], "Displays the contents of virtual files page by page (all pages shown here).", "more file [...]", (args) => {
+  command("more", [], "Displays the contents of files page by page.", "more file [...]", (args) => {
     if (!args.length) return invalidUsage("more");
     for (const path of args) {
       const content = readFile(resolvePath(path));
@@ -1176,7 +1170,7 @@ function registerCommands() {
       else addText(content.endsWith("\n") ? content : `${content}\n`);
     }
   });
-  command("ren", ["rename"], "Renames a virtual file or directory.", "ren source newname", (args) => {
+  command("ren", ["rename"], "Renames a file or directory.", "ren source newname", (args) => {
     if (args.length !== 2 || args[1].includes("\\") || args[1].includes("/")) return invalidUsage("ren");
     const sourcePath = resolvePath(args[0]);
     const source = getEntry(sourcePath);
@@ -1186,7 +1180,7 @@ function registerCommands() {
     else if (result.error) addText("The system cannot find the path specified.\n");
     else addText("");
   });
-  command("attrib", [], "Displays or changes virtual file attributes.", "attrib [+R|-R] [+H|-H] [+S|-S] [path]", (args) => {
+  command("attrib", [], "Displays or changes file attributes.", "attrib [+R|-R] [+H|-H] [+S|-S] [path]", (args) => {
     const changes = args.filter((arg) => /^[+-][rhs]$/i.test(arg));
     const paths = args.filter((arg) => !arg.startsWith("/")).filter((arg) => !/^[+-][rhs]$/i.test(arg));
     const matches = paths.length ? paths.flatMap((path) => expandVirtualPath(path)) : [getEntry(currentFolder)];
@@ -1202,7 +1196,7 @@ function registerCommands() {
       addText(`${attrs}    ${entry.path}\n`);
     }
   });
-  command("where", [], "Searches virtual PATH directories for files.", "where [path;path] pattern", (args) => {
+  command("where", [], "Searches PATH directories for files.", "where [path;path] pattern", (args) => {
     const pattern = args.at(-1);
     if (!pattern) return invalidUsage("where");
     const requestedPaths = args.length > 1 ? args.slice(0, -1).join(" ").split(";") : (environment.get("PATH") || "").split(";");
@@ -1215,7 +1209,7 @@ function registerCommands() {
     if (!found.length) addText(`INFO: Could not find files for the given pattern(s).\n`);
     else addText(`${found.map((entry) => entry.path).join("\n")}\n`);
   });
-  command("find", [], "Searches for text in virtual files.", "find [/i] [/n] [/v] [/c] \"string\" file [...]", (args) => {
+  command("find", [], "Searches for text in files.", "find [/i] [/n] [/v] [/c] \"string\" file [...]", (args) => {
     const switches = args.filter((arg) => arg.startsWith("/"));
     const rest = args.filter((arg) => !arg.startsWith("/"));
     const needle = rest.shift();
@@ -1234,7 +1228,7 @@ function registerCommands() {
       else for (const match of matches) addText(`${isSwitch(switches, "/n") ? `${match.index + 1}:` : ""}${match.line}\n`);
     }
   });
-  command("findstr", [], "Searches for text patterns in virtual files.", "findstr [/i] [/n] [/s] [/r] pattern [file ...]", (args) => {
+  command("findstr", [], "Searches for text patterns in files.", "findstr [/i] [/n] [/s] [/r] pattern [file ...]", (args) => {
     const switches = args.filter((arg) => arg.startsWith("/"));
     const rest = args.filter((arg) => !arg.startsWith("/"));
     const pattern = rest.shift();
@@ -1271,7 +1265,7 @@ function registerCommands() {
     }
     if (!found) addText("FINDSTR: Cannot open file or no matching lines found.\n");
   });
-  command("fc", [], "Compares the contents of two virtual files.", "fc [/b] file1 file2", (args) => {
+  command("fc", [], "Compares the contents of two files.", "fc [/b] file1 file2", (args) => {
     const files = args.filter((arg) => !arg.startsWith("/"));
     if (files.length !== 2) return invalidUsage("fc");
     const left = readLines(resolvePath(files[0]));
@@ -1287,7 +1281,7 @@ function registerCommands() {
     }
   });
 
-  command("set", [], "Displays or changes simulated environment variables.", "set [variable=[string]]", (args) => {
+  command("set", [], "Displays or changes environment variables.", "set [variable=[string]]", (args) => {
     if (!args.length) {
       addText([...environment].map(([key, value]) => `${key}=${value}`).sort((a, b) => a.localeCompare(b)).join("\n") + "\n");
       return;
@@ -1305,11 +1299,11 @@ function registerCommands() {
     if (assignment.slice(separator + 1)) environment.set(key, assignment.slice(separator + 1));
     else environment.delete(key);
   });
-  command("path", [], "Displays or sets the simulated executable search path.", "path [path;path]", (args) => {
+  command("path", [], "Displays or sets the executable search path.", "path [path;path]", (args) => {
     if (!args.length) addText(`PATH=${environment.get("PATH") || ""}\n`);
     else environment.set("PATH", args.join(" "));
   });
-  command("assoc", [], "Displays or changes simulated file-extension associations.", "assoc [.ext[=fileType]]", (args) => {
+  command("assoc", [], "Displays or changes file-extension associations.", "assoc [.ext[=fileType]]", (args) => {
     if (!args.length) addText([...associations].sort().map(([extension, type]) => `${extension}=${type}`).join("\n") + "\n");
     else {
       const [extension, type] = args.join(" ").split("=", 2);
@@ -1319,7 +1313,7 @@ function registerCommands() {
       else associations.delete(extension);
     }
   });
-  command("ftype", [], "Displays or changes simulated file-type open commands.", "ftype [fileType[=command]]", (args) => {
+  command("ftype", [], "Displays or changes file-type open commands.", "ftype [fileType[=command]]", (args) => {
     if (!args.length) addText([...fileTypes].sort().map(([type, action]) => `${type}=${action}`).join("\n") + "\n");
     else {
       const [type, action] = args.join(" ").split("=", 2);
@@ -1466,7 +1460,6 @@ document.addEventListener("keydown", (event) => {
   if (!running) return;
   if (event.key.toLowerCase() === "g") {
     gPresses++;
-    counter.textContent = `G : ${gPresses} / 5`;
     if (gPresses >= 5) stopTerminal(true);
   }
 });

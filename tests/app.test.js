@@ -79,7 +79,7 @@ test("help lists registered commands and provides command-specific help", () => 
     assert.match(listing, new RegExp(`\\b${name}\\b`));
   }
   const detail = terminal.run("help ping");
-  assert.match(detail, /Tests connectivity using simulated replies/);
+  assert.match(detail, /Tests connectivity to another host/);
   assert.match(detail, /Usage: ping \[-n count\] target/);
 });
 

@@ -1,3 +1,4 @@
+```markdown
 # cmd-prank
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
@@ -31,6 +32,7 @@ C:\Users\User> dir /s
 02/07/2026  14:22    <DIR>          System
 02/07/2026  14:22        4 821 337 kernel32.dll
 ...
+
 ```
 
 ## Getting started
@@ -40,8 +42,9 @@ No installation is required. You only need a modern web browser.
 ### Open the file directly
 
 ```bash
-git clone https://github.com/TheoOnTop120/cmd-prank.git
+git clone [https://github.com/TheoOnTop120/cmd-prank.git](https://github.com/TheoOnTop120/cmd-prank.git)
 cd cmd-prank
+
 ```
 
 Then open `index.html` in your browser.
@@ -49,9 +52,10 @@ Then open `index.html` in your browser.
 ### Serve it locally
 
 ```bash
-git clone https://github.com/TheoOnTop120/cmd-prank.git
+git clone [https://github.com/TheoOnTop120/cmd-prank.git](https://github.com/TheoOnTop120/cmd-prank.git)
 cd cmd-prank
 python3 -m http.server 8000
+
 ```
 
 Then go to `http://localhost:8000`.
@@ -60,9 +64,9 @@ Then go to `http://localhost:8000`.
 
 On startup a boot menu asks which system to start. Press `1` (Windows) or `2` (Linux), or click an option.
 
-- `switchos` returns to the menu (press `Esc` there to stay where you were).
-- `switchos windows` / `switchos linux` switches directly. Each system keeps its own screen, files and folder, so you can go back and forth.
-- The `Restart` button of the prank screen resets everything and returns to the menu.
+* `switchos` returns to the menu (press `Esc` there to stay where you were).
+* `switchos windows` / `switchos linux` switches directly. Each system keeps its own screen, files and folder, so you can go back and forth.
+* The `Restart` button of the prank screen resets everything and returns to the menu.
 
 ## Supported commands (Windows)
 
@@ -78,6 +82,7 @@ File commands operate on the virtual filesystem only. For example:
 
 ```bat
 echo Hello > "My Documents\note.txt"
+
 ```
 
 ## Supported commands (Linux)
@@ -94,6 +99,7 @@ Every command accepts `--help`. Restricted files (`/etc/shadow`, `/root`, `/var/
 ```bash
 echo "Hello" > note.txt && cat note.txt | grep -c Hello
 sudo cat /var/log/auth.log
+
 ```
 
 ## Triggering the prank
@@ -108,6 +114,7 @@ The test suite uses the built-in Node.js test runner and has no external depende
 
 ```bash
 node --test tests/app.test.js
+
 ```
 
 ## Project structure
@@ -123,8 +130,13 @@ cmd-prank/
 ├── tests/
 │   └── app.test.js     # Behavior tests
 └── README.md           # Project documentation
+
 ```
 
 ## Disclaimer
 
 This project is a simulation intended for entertainment. It does not reproduce a real Windows environment and is not meant to be used as a productivity tool. Please use it only on people who will find it funny, and be ready to explain that it is a joke.
+
+```
+
+```

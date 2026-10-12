@@ -5,20 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>cmd.exe</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="js/linux.js" defer></script>
     <script src="js/app.js" defer></script>
   </head>
 
   <body>
     <main id="terminal">
-      <div id="history">
-Microsoft Windows [Version 10.0.19045.0000]
-(c) Microsoft Corporation. All rights reserved.
-
-
-Type <span style="color:#a8ffb5">help</span>, then press Enter.
-
-
-      </div>
+      <div id="history"></div>
 
       <form id="command-form" class="prompt-line" autocomplete="off">
         <span id="prompt" class="prompt">C:\Users\User> </span>
@@ -26,7 +19,7 @@ Type <span style="color:#a8ffb5">help</span>, then press Enter.
           id="command-input"
           type="text"
           aria-label="Terminal command"
-          autofocus
+          disabled
           spellcheck="false"
           autocomplete="off"
         >
@@ -34,6 +27,18 @@ Type <span style="color:#a8ffb5">help</span>, then press Enter.
 
       <div id="output"></div>
     </main>
+
+    <section id="os-select" aria-label="Operating system selection">
+      <div class="menu">
+        <p class="menu-title">BOOT MANAGER v2.4</p>
+        <p class="menu-sub">Select an operating system to start:</p>
+        <button type="button" data-os="windows"><span class="key">1</span> Windows 10 Pro <em>cmd.exe</em></button>
+        <button type="button" data-os="linux"><span class="key">2</span> Ubuntu 22.04 LTS <em>bash</em></button>
+        <p class="menu-hint">Press <b>1</b> or <b>2</b>, or click an option.<br>Type <b>switchos</b> in the terminal to come back here.</p>
+      </div>
+    </section>
+
+    <div id="counter">G : 0 / 5</div>
 
     <section id="finished">
       <div class="box">

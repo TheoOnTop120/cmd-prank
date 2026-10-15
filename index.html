@@ -10,31 +10,47 @@
   </head>
 
   <body>
-    <main id="terminal">
-      <div id="history"></div>
+    <div id="scan-bar" aria-hidden="true"><span></span></div>
+    <div id="scan-status" aria-hidden="true"><i class="dot"></i><span id="scan-text"></span></div>
 
-      <form id="command-form" class="prompt-line" autocomplete="off">
-        <span id="prompt" class="prompt">C:\Users\User> </span>
-        <input
-          id="command-input"
-          type="text"
-          aria-label="Terminal command"
-          disabled
-          spellcheck="false"
-          autocomplete="off"
-        >
-      </form>
+    <div id="window">
+      <header id="titlebar">
+        <span class="tb-icon" aria-hidden="true"></span>
+        <span id="title-text">C:\Windows\system32\cmd.exe</span>
+        <span class="tb-actions" aria-hidden="true"><i class="min">&#x2014;</i><i class="max">&#x25A2;</i><i class="close">&#x2715;</i></span>
+      </header>
 
-      <div id="output"></div>
-    </main>
+      <main id="terminal">
+        <div id="history"></div>
+
+        <form id="command-form" class="prompt-line" autocomplete="off">
+          <span id="prompt" class="prompt">C:\Users\User&gt; </span>
+          <input
+            id="command-input"
+            type="text"
+            aria-label="Terminal command"
+            disabled
+            spellcheck="false"
+            autocomplete="off"
+          >
+        </form>
+
+        <div id="output"></div>
+      </main>
+    </div>
 
     <section id="os-select" aria-label="Operating system selection">
-      <div class="menu">
-        <p class="menu-title">BOOT MANAGER v2.4</p>
-        <p class="menu-sub">Select an operating system to start:</p>
-        <button type="button" data-os="windows"><span class="key">1</span> Windows 10 Pro <em>cmd.exe</em></button>
-        <button type="button" data-os="linux"><span class="key">2</span> Ubuntu 22.04 LTS <em>bash</em></button>
-        <p class="menu-hint">Press <b>1</b> or <b>2</b>, or click an option.<br>Type <b>switchos</b> in the terminal to come back here.</p>
+      <div class="grub">
+        <p class="grub-title">GNU GRUB  version 2.06</p>
+        <ul class="grub-list">
+          <li><button type="button" data-os="windows" class="selected">Windows 10 Pro (on /dev/sda1)</button></li>
+          <li><button type="button" data-os="linux">Ubuntu 22.04.4 LTS</button></li>
+        </ul>
+        <p class="grub-help">
+          Use the &uarr; and &darr; keys to select which entry is highlighted.<br>
+          Press Enter to boot the selected OS, or press 1 or 2 to boot directly.<br>
+          Type <b>switchos</b> in the terminal to return to this menu.
+        </p>
       </div>
     </section>
 
@@ -42,11 +58,14 @@
 
     <section id="finished">
       <div class="box">
-        <h1>All your files are now on the dark web.</h1>
+        <p class="eyebrow">System notice</p>
+        <h1 data-text="All your files are now on the dark web.">All your files are now on the dark web.</h1>
         <p>
           If you want them removed from the dark web, make a transfer of 50000 euros
         </p>
+        <p class="timer">Time left before they are published <span id="countdown">47:59:59</span></p>
         <button id="restart" type="button">Restart</button>
+        <p class="hint">Relax, it is only a prank.</p>
       </div>
     </section>
   </body>

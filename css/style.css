@@ -1,23 +1,36 @@
+/*
+ * Minimal, terminal-true look.
+ * Windows is the default theme; body.os-linux overrides the tokens.
+ * Text stays neutral, the accent colour is reserved for chrome, scan and final screen.
+ */
 :root {
-  --fg: #39ff5a;
-  --fg-glow: rgba(57, 255, 90, 0.55);
-  --fg-dim: rgba(57, 255, 90, 0.45);
-  --panel: #031006;
-  --btn: #061c0b;
-  --btn-hover: #0c3014;
-  --box-glow: rgba(57, 255, 90, 0.22);
-  --bg: #000;
+  --fg: #cccccc;
+  --muted: rgba(204, 204, 204, 0.5);
+  --accent: #4aa3ff;
+  --accent-soft: rgba(74, 163, 255, 0.35);
+  --win-bg: #0c0c0c;
+  --win-border: rgba(255, 255, 255, 0.09);
+  --title-bg: #1b1b1d;
+  --title-fg: #d4d4d8;
+  --desk:
+    radial-gradient(ellipse 80% 60% at 72% -5%, rgba(40, 90, 170, 0.55), transparent 70%),
+    #090c12;
+  --mono: "Cascadia Mono", "Cascadia Code", Consolas, "Lucida Console", "Courier New", monospace;
 }
 
 body.os-linux {
-  --fg: #ff4d4d;
-  --fg-glow: rgba(255, 60, 60, 0.6);
-  --fg-dim: rgba(255, 77, 77, 0.5);
-  --panel: #1a0305;
-  --btn: #2a0508;
-  --btn-hover: #45090d;
-  --box-glow: rgba(255, 60, 60, 0.3);
-  --bg: radial-gradient(ellipse at center, #16000a 0%, #050003 100%);
+  --fg: #e7dfe0;
+  --muted: rgba(231, 223, 224, 0.5);
+  --accent: #ff5f5f;
+  --accent-soft: rgba(255, 95, 95, 0.35);
+  --win-bg: #110b0d;
+  --win-border: rgba(255, 255, 255, 0.08);
+  --title-bg: #1c1315;
+  --title-fg: #e3d3d5;
+  --desk:
+    radial-gradient(ellipse 70% 55% at 18% -8%, rgba(120, 22, 40, 0.6), transparent 70%),
+    #090507;
+  --mono: "Ubuntu Mono", "DejaVu Sans Mono", "Liberation Mono", monospace;
 }
 
 * {
@@ -32,46 +45,146 @@ body {
   overflow: hidden;
   background: #000;
   color: var(--fg);
-  font-family: Consolas, "Courier New", monospace;
+  font-family: var(--mono);
 }
 
 body {
-  padding: 18px;
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--desk);
 }
 
-body.os-linux::after {
-  content: "";
+::selection {
+  color: #fff;
+  background: var(--accent-soft);
+}
+
+/* ---- Window frame ---------------------------------------------------- */
+
+#window {
   position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0, rgba(0, 0, 0, 0.18) 1px, transparent 1px, transparent 3px);
+  inset: clamp(0px, 5vh, 44px) clamp(0px, 7vw, 110px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--win-border);
+  border-radius: 10px;
+  background: var(--win-bg);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  body.os-linux #terminal {
-    animation: flicker 6s infinite;
+  #window {
+    animation: window-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 }
 
-@keyframes flicker {
-  0%, 94%, 100% { opacity: 1; }
-  95% { opacity: 0.82; }
-  96% { opacity: 1; }
-  97% { opacity: 0.9; }
+@keyframes window-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: none; }
 }
 
-#terminal {
+@media (max-width: 700px) {
+  #window {
+    inset: 0;
+    border: 0;
+    border-radius: 0;
+  }
+}
+
+#titlebar {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  height: 36px;
+  padding-left: 14px;
+  color: var(--title-fg);
+  background: var(--title-bg);
+  border-bottom: 1px solid var(--win-border);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 12.5px;
+  user-select: none;
+}
+
+.tb-icon {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  background: linear-gradient(currentColor, currentColor) 2px 3px / 5px 1.5px no-repeat;
+  opacity: 0.8;
+}
+
+#title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+.tb-actions {
+  display: flex;
+  margin-left: auto;
   height: 100%;
+}
+
+.tb-actions i {
+  display: grid;
+  width: 46px;
+  place-items: center;
+  font-style: normal;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.tb-actions .close:hover {
+  background: #c42b1c;
+  color: #fff;
+  opacity: 1;
+}
+
+body.os-linux #titlebar {
+  justify-content: center;
+  padding-left: 0;
+}
+
+body.os-linux .tb-icon,
+body.os-linux .tb-actions .min,
+body.os-linux .tb-actions .max {
+  display: none;
+}
+
+body.os-linux .tb-actions {
+  position: absolute;
+  right: 12px;
+  align-items: center;
+}
+
+body.os-linux .tb-actions .close {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 10px;
+}
+
+/* ---- Terminal --------------------------------------------------------- */
+
+#terminal {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 16px 22px 22px;
   overflow-x: hidden;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
-  font-size: clamp(11px, 1.6vw, 16px);
-  line-height: 1.22;
-  text-shadow: 0 0 4px var(--fg-glow);
+  font-size: clamp(12px, 1.45vw, 15px);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
   user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }
 
 #history {
@@ -96,14 +209,75 @@ body.os-linux::after {
   outline: 0;
   background: transparent;
   color: var(--fg);
-  caret-color: var(--fg);
+  caret-color: var(--accent);
+  caret-shape: block;
   font: inherit;
-  text-shadow: inherit;
+  letter-spacing: inherit;
 }
 
-#command-input::selection {
-  color: #000;
-  background: var(--fg);
+#output {
+  color: var(--accent);
+}
+
+/* ---- Scan overlay ----------------------------------------------------- */
+
+#scan-bar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+#scan-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.12s linear;
+}
+
+#scan-status {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: clamp(14px, 6vh, 52px);
+  z-index: 6;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: #e9e9ee;
+  background: rgba(8, 8, 10, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+#scan-status .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #scan-status .dot {
+    animation: pulse 1.1s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.7); }
 }
 
 #counter {
@@ -111,13 +285,17 @@ body.os-linux::after {
   position: fixed;
   right: 18px;
   bottom: 14px;
-  color: var(--fg-dim);
+  z-index: 5;
+  color: var(--muted);
   font-size: 12px;
   opacity: 0;
   transition: opacity 0.15s ease;
 }
 
+/* ---- Final screen ----------------------------------------------------- */
+
 #finished {
+  --accent: #ff5f5f;
   display: none;
   position: fixed;
   inset: 0;
@@ -125,45 +303,168 @@ body.os-linux::after {
   padding: 28px;
   place-items: center;
   text-align: center;
-  background: #000;
-  color: var(--fg);
-  font-family: Consolas, "Courier New", monospace;
-  text-shadow: 0 0 5px var(--fg-glow);
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 38%, rgba(255, 60, 60, 0.16), transparent 70%),
+    #050506;
+  color: #e9e9ee;
+  font-family: var(--mono);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #finished {
+    animation: final-in 0.6s ease both;
+  }
+}
+
+@keyframes final-in {
+  from { opacity: 0; filter: blur(6px); }
+  to { opacity: 1; filter: none; }
 }
 
 #finished .box {
-  max-width: 700px;
-  padding: 36px;
-  border: 1px solid var(--fg);
-  background: var(--panel);
-  box-shadow: 0 0 36px var(--box-glow);
+  width: min(640px, 100%);
+  padding: 8px 0;
+}
+
+#finished .eyebrow {
+  margin: 0 0 22px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
 }
 
 #finished h1 {
-  margin-top: 0;
-  font-size: clamp(1.7rem, 6vw, 3.1rem);
+  position: relative;
+  margin: 0 0 20px;
+  color: #fff;
+  font-size: clamp(1.6rem, 4.8vw, 2.7rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+#finished h1::before,
+#finished h1::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+#finished h1::before {
+  color: #00e5ff;
+}
+
+#finished h1::after {
+  color: #ff2a6d;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #finished h1::before {
+    opacity: 0.8;
+    animation: glitch-a 4.2s infinite steps(1, end);
+  }
+
+  #finished h1::after {
+    opacity: 0.8;
+    animation: glitch-b 4.2s infinite steps(1, end);
+  }
+}
+
+@keyframes glitch-a {
+  0%, 60%, 100% { clip-path: inset(0 0 100% 0); transform: none; }
+  61% { clip-path: inset(12% 0 58% 0); transform: translate(-5px, 1px); }
+  63% { clip-path: inset(64% 0 8% 0); transform: translate(4px, -1px); }
+  65% { clip-path: inset(0 0 100% 0); transform: none; }
+  88% { clip-path: inset(48% 0 22% 0); transform: translate(6px, 0); }
+  89% { clip-path: inset(0 0 100% 0); transform: none; }
+}
+
+@keyframes glitch-b {
+  0%, 60%, 100% { clip-path: inset(0 0 100% 0); transform: none; }
+  62% { clip-path: inset(52% 0 20% 0); transform: translate(5px, -1px); }
+  64% { clip-path: inset(6% 0 70% 0); transform: translate(-4px, 1px); }
+  66% { clip-path: inset(0 0 100% 0); transform: none; }
+  88.5% { clip-path: inset(18% 0 56% 0); transform: translate(-6px, 0); }
+  89.5% { clip-path: inset(0 0 100% 0); transform: none; }
 }
 
 #finished p {
-  line-height: 1.6;
+  margin: 0;
+  color: #b4b4bd;
+  line-height: 1.7;
+}
+
+#finished .timer {
+  margin-top: 30px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+
+#countdown {
+  display: block;
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+#finished .hint {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #finished .hint {
+    animation: reveal 0.9s ease 9s forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #finished .hint {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal {
+  to { opacity: 1; }
 }
 
 button {
-  margin-top: 16px;
-  padding: 11px 18px;
+  margin-top: 24px;
+  padding: 10px 26px;
   cursor: pointer;
-  border: 1px solid var(--fg);
-  border-radius: 4px;
-  color: var(--fg);
-  background: var(--btn);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  color: #e9e9ee;
+  background: transparent;
   font: inherit;
-  text-shadow: 0 0 4px var(--fg-glow);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 button:hover {
-  background: var(--btn-hover);
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.07);
 }
 
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---- Boot menu (GRUB, refined) ---------------------------------------- */
 
 #os-select {
   display: flex;
@@ -173,76 +474,85 @@ button:hover {
   padding: 24px;
   align-items: center;
   justify-content: center;
-  background: #000;
-  color: #d8d8d8;
-  font-family: Consolas, "Courier New", monospace;
+  background: radial-gradient(ellipse 70% 50% at 50% 35%, #12141a 0%, #050506 75%);
+  color: #cfd0d6;
+  font-family: "DejaVu Sans Mono", "Cascadia Mono", "Liberation Mono", Consolas, monospace;
 }
 
-#os-select .menu {
+@media (prefers-reduced-motion: no-preference) {
+  #os-select .grub {
+    animation: grub-in 0.5s ease both;
+  }
+}
+
+@keyframes grub-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+#os-select .grub {
   width: min(560px, 100%);
 }
 
-#os-select .menu-title {
-  margin: 0 0 6px;
-  color: #fff;
-  font-size: 1.25rem;
-  letter-spacing: 0.12em;
-}
-
-#os-select .menu-sub,
-#os-select .menu-hint {
+#os-select .grub-title {
   margin: 0 0 18px;
-  color: #9a9a9a;
+  text-align: center;
+  color: #8d8f99;
+  font-size: 0.8rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
 }
 
-#os-select .menu-hint {
-  margin: 22px 0 0;
-  font-size: 0.85rem;
+#os-select .grub-list {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
-#os-select button {
+#os-select .grub-list button {
   display: block;
   width: 100%;
-  margin: 0 0 10px;
-  padding: 14px 16px;
+  margin: 0;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 5px;
+  color: #aeb0ba;
+  background: transparent;
+  font: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0;
   text-align: left;
-  color: #e8e8e8;
-  border: 1px solid #555;
-  background: #0d0d0d;
-  text-shadow: none;
 }
 
-#os-select button:hover,
-#os-select button:focus-visible {
-  outline: 0;
-  border-color: #fff;
-  background: #1c1c1c;
+#os-select .grub-list button:hover {
+  border: 0;
 }
 
-#os-select button[data-os="linux"]:hover,
-#os-select button[data-os="linux"]:focus-visible {
-  border-color: #ff4d4d;
-  box-shadow: 0 0 14px rgba(255, 60, 60, 0.35);
+#os-select .grub-list button.selected {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: inset 2px 0 0 #fff;
 }
 
-#os-select button[data-os="windows"]:hover,
-#os-select button[data-os="windows"]:focus-visible {
-  border-color: #39ff5a;
-  box-shadow: 0 0 14px rgba(57, 255, 90, 0.3);
+#os-select .grub-list button[data-os="windows"].selected {
+  box-shadow: inset 2px 0 0 #4aa3ff;
 }
 
-#os-select .key {
-  display: inline-block;
-  min-width: 1.6em;
-  margin-right: 10px;
-  padding: 1px 6px;
-  text-align: center;
-  color: #000;
-  background: #d8d8d8;
+#os-select .grub-list button[data-os="linux"].selected {
+  box-shadow: inset 2px 0 0 #ff5f5f;
 }
 
-#os-select em {
-  float: right;
-  color: #8a8a8a;
-  font-style: normal;
+#os-select .grub-help {
+  margin: 20px 4px 0;
+  color: #777a86;
+  font-size: 0.78rem;
+  line-height: 1.8;
+}
+
+#os-select .grub-help b {
+  color: #aeb0ba;
+  font-weight: 600;
 }

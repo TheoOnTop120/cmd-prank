@@ -10,6 +10,9 @@ const counter = document.getElementById("counter");
 const finished = document.getElementById("finished");
 const restartButton = document.getElementById("restart");
 const osSelect = document.getElementById("os-select");
+const titleText = document.getElementById("title-text");
+const scanBar = document.getElementById("scan-bar");
+const countdownEl = document.getElementById("countdown");
 
 const system = {
   hostName: "DESKTOP-USER",
@@ -147,6 +150,12 @@ let activeOS = "windows";
 let osChosen = false;
 let osSelecting = false;
 const savedScreens = { windows: null, linux: null };
+const osOrder = ["windows", "linux"];
+let menuIndex = 0;
+let customTitle = null;
+let scanProgress = 0;
+let countdownId;
+let countdownLeft = 0;
 
 function playTone(frequency, duration, volume = 0.04) {
   try {
@@ -193,8 +202,20 @@ function addText(text) {
   terminal.scrollTop = terminal.scrollHeight;
 }
 
+function refreshTitle() {
+  let bar = customTitle;
+  if (bar === null) {
+    bar = activeOS === "linux"
+      ? linuxOS.prompt().replace(/[$#] $/, "").replace("@ghost:", "@ghost: ")
+      : "C:\\Windows\\system32\\cmd.exe";
+  }
+  document.title = customTitle ?? (activeOS === "linux" ? bar : "cmd.exe");
+  if (titleText) titleText.textContent = bar;
+}
+
 function updatePrompt() {
   prompt.textContent = activeOS === "linux" ? linuxOS.prompt() : `${currentFolder}> `;
+  refreshTitle();
 }
 
 function addPrompt(command) {
@@ -501,8 +522,43 @@ function changeColor(argument) {
   addText("Color changed.\n");
 }
 
+const scanStatus = document.getElementById("scan-status");
+const scanText = document.getElementById("scan-text");
+let scanFiles = 0;
+
+function showScanBar(visible) {
+  if (scanStatus) {
+    scanStatus.style.display = visible ? "flex" : "none";
+    if (visible && scanText) {
+      const target = activeOS === "linux" ? "Uploading to 203.0.113.66" : "Scanning C:\\";
+      scanText.textContent = `${target}  \u00b7  ${Math.floor(scanProgress)}%  \u00b7  ${scanFiles.toLocaleString("en-US")} files`;
+    }
+  }
+  if (!scanBar) return;
+  scanBar.style.display = visible ? "block" : "none";
+  if (scanBar.firstElementChild) scanBar.firstElementChild.style.width = `${scanProgress}%`;
+}
+
+function formatCountdown(seconds) {
+  const part = (value) => String(Math.floor(value)).padStart(2, "0");
+  return `${part(seconds / 3600)}:${part((seconds % 3600) / 60)}:${part(seconds % 60)}`;
+}
+
+function startCountdown() {
+  clearInterval(countdownId);
+  countdownLeft = 48 * 3600 - 1;
+  if (countdownEl) countdownEl.textContent = formatCountdown(countdownLeft);
+  countdownId = setInterval(() => {
+    countdownLeft = Math.max(0, countdownLeft - 1);
+    if (countdownEl) countdownEl.textContent = formatCountdown(countdownLeft);
+  }, 1000);
+}
+
 function addFakeScanLines() {
   if (!running) return;
+  scanProgress = Math.min(97, scanProgress + 0.4);
+  scanFiles += 20 + Math.floor(Math.random() * 60);
+  showScanBar(true);
   let text = "";
   if (activeOS === "linux") {
     text = linuxOS.scanChunk();
@@ -535,6 +591,9 @@ function createFakeLine() {
 function startTerminal() {
   running = true;
   gPresses = 0;
+  scanProgress = 0;
+  scanFiles = 0;
+  showScanBar(true);
   commandInput.disabled = true;
   commandForm.style.display = "none";
   output.textContent = "";
@@ -550,8 +609,11 @@ function stopTerminal(showFinalScreen = true) {
   running = false;
   clearInterval(intervalId);
   counter.style.display = "none";
+  scanProgress = 100;
+  showScanBar(false);
   if (showFinalScreen) {
     playStopSound();
+    startCountdown();
     finished.style.display = "grid";
   } else {
     commandInput.disabled = false;
@@ -571,8 +633,10 @@ function applyTheme() {
   commandInput.style.caretColor = "";
 }
 
-function setWindowTitle(text) {
-  document.title = text;
+function setWindowTitle(text, barText = text) {
+  customTitle = text === null ? null : barText;
+  if (text !== null) document.title = text;
+  refreshTitle();
 }
 
 function closeSession() {
@@ -583,7 +647,16 @@ function saveCurrentScreen() {
   if (osChosen) savedScreens[activeOS] = history.textContent;
 }
 
+function highlightMenu(index) {
+  menuIndex = (index + osOrder.length) % osOrder.length;
+  if (!osSelect || !osSelect.querySelectorAll) return;
+  for (const button of osSelect.querySelectorAll("[data-os]")) {
+    if (button.classList) button.classList.toggle("selected", button.dataset.os === osOrder[menuIndex]);
+  }
+}
+
 function showOsSelect() {
+  highlightMenu(osChosen ? osOrder.indexOf(activeOS) : 0);
   osSelecting = true;
   commandInput.disabled = true;
   if (osSelect) osSelect.style.display = "flex";
@@ -598,7 +671,9 @@ function setOS(target) {
   running = false;
   gPresses = 0;
   applyTheme();
-  setWindowTitle(target === "linux" ? "user@ghost: ~" : "cmd.exe");
+  setWindowTitle(null);
+  showScanBar(false);
+  clearInterval(countdownId);
   history.textContent = savedScreens[target] ?? (target === "linux" ? linuxOS.banner() : windowsBanner());
   output.textContent = "";
   commandInput.value = "";
@@ -646,7 +721,9 @@ function resetTerminal() {
   osChosen = false;
   activeOS = "windows";
   applyTheme();
-  setWindowTitle("cmd.exe");
+  setWindowTitle(null);
+  showScanBar(false);
+  clearInterval(countdownId);
   history.textContent = "";
   output.textContent = "";
   commandInput.value = "";
@@ -1414,7 +1491,8 @@ function registerCommands() {
     }
   });
   command("title", [], "Sets the terminal window title.", "title [text]", (args) => {
-    document.title = args.join(" ") || "cmd.exe";
+    const text = args.join(" ");
+    setWindowTitle(text || "cmd.exe", text || "C:\\Windows\\system32\\cmd.exe");
   });
   command("color", [], "Changes the terminal text color.", "color <code>", (args) => changeColor(args[0] || ""));
   command("pause", [], "Simulates the CMD pause prompt.", "pause", () => addText("Press any key to continue . . . (simulated)\n"));
@@ -1556,8 +1634,14 @@ commandForm.addEventListener("submit", (event) => {
 document.addEventListener("keydown", (event) => {
   if (osSelecting) {
     const key = event.key.toLowerCase();
+    if (key === "arrowdown" || key === "arrowup") {
+      if (event.preventDefault) event.preventDefault();
+      highlightMenu(menuIndex + (key === "arrowdown" ? 1 : -1));
+      return;
+    }
     const choice = key === "1" || key === "w" ? "windows"
       : key === "2" || key === "l" ? "linux"
+      : key === "enter" ? osOrder[menuIndex]
       : key === "escape" && osChosen ? activeOS : null;
     if (choice) {
       // Stop the key from being typed into the input that setOS() focuses.
@@ -1579,6 +1663,7 @@ restartButton.addEventListener("click", resetTerminal);
 if (osSelect) {
   for (const button of osSelect.querySelectorAll ? osSelect.querySelectorAll("[data-os]") : []) {
     button.addEventListener("click", () => setOS(button.dataset.os));
+    button.addEventListener("mouseenter", () => highlightMenu(osOrder.indexOf(button.dataset.os)));
   }
 }
 

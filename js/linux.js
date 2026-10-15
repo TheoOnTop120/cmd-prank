@@ -1789,7 +1789,7 @@ const linuxOS = (() => {
       requestOSSwitch(args[0] || "", ctx);
     });
 
-    cmd("title", [], "Set the terminal window title.", "title [text]", (args) => setWindowTitle(args.join(" ") || "user@ghost: ~"));
+    cmd("title", [], "Set the terminal window title.", "title [text]", (args) => setWindowTitle(args.length ? args.join(" ") : null));
   }
 
   /* ------------------------------------------------------------------ */
